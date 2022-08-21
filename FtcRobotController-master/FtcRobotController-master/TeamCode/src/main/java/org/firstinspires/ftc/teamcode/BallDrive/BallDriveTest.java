@@ -27,7 +27,6 @@ public class BallDriveTest extends LinearOpMode{
     public void runOpMode(){
         robot.init(hardwareMap);
 
-//test
 
         waitForStart();
 
