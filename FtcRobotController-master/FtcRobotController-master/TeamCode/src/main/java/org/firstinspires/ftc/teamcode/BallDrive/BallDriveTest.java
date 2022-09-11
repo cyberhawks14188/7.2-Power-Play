@@ -32,8 +32,19 @@ public class BallDriveTest extends LinearOpMode{
 
         while (opModeIsActive()){
 
+            if(gamepad1.a){
+                robot.Servo1.setPower(1);
+                robot.Servo2.setPower(-1);
+            }else if(gamepad1.b){
+                robot.Servo1.setPower(-1);
+                robot.Servo2.setPower(1);
+            }else{
+                robot.Servo1.setPower(0);
+                robot.Servo2.setPower(0);
+            }
+
             robot.MotorLL.setPower(-gamepad1.left_stick_y);
-            robot.MotorLR.setPower(gamepad1.left_stick_y);
+            robot.MotorLR.setPower(-gamepad1.right_stick_y);
 
             telemetry.addData("LL Current", robot.MotorLL.getCurrent(CurrentUnit.MILLIAMPS));
             telemetry.addData("LR Current", robot.MotorLR.getCurrent(CurrentUnit.MILLIAMPS));

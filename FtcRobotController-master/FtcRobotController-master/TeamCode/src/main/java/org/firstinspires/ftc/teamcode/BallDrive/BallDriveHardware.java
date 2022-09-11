@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.BallDrive;
 
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,6 +12,8 @@ public class BallDriveHardware {
     public DcMotorEx MotorLR;
     public DcMotorEx MotorRL;
     public DcMotorEx MotorRR;
+    public CRServo Servo1;
+    public CRServo Servo2;
 
 
 
@@ -22,6 +26,8 @@ public class BallDriveHardware {
         MotorLR = BDHardware.get(DcMotorEx.class, "Motor2");
         MotorRL = BDHardware.get(DcMotorEx.class, "Motor3");
         MotorRR = BDHardware.get(DcMotorEx.class, "Motor4");
+        Servo1 = BDHardware.get(CRServo.class, "CRServo1");
+        Servo2 = BDHardware.get(CRServo.class, "CRServo2");
 
 
         MotorLL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
