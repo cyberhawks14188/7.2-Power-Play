@@ -3,14 +3,11 @@ package org.firstinspires.ftc.teamcode.BallDrive;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -21,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 @TeleOp
 @Config
 
-public class HolonimicTest extends LinearOpMode{
+public class Field_Centric_Holonomic extends LinearOpMode{
 
 
     BallDriveHardware robot = new BallDriveHardware();
@@ -40,32 +37,15 @@ public class HolonimicTest extends LinearOpMode{
     double RLDIR,RRDIR,LRDIR,LLDIR;
     double maxmotor, speed;
 
+    double vectorMagnitude = 0, vectorAngleRAD = 0, vectorAngleDEG = 0;
+    double finalvectorAngleDEG = 0;
+
     @Override
 
     public void runOpMode(){
         robot.init(hardwareMap);
 
-       // gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
 
-        //telemetry.addData(">", "Calibrating Gyro");    //
-        //telemetry.update();
-
-        /*gyro.calibrate();
-
-        // make sure the gyro is calibrated before continuing
-        while (!isStopRequested() && gyro.isCalibrating())  {
-            sleep(50);
-            idle();
-        }
-
-        telemetry.addData(">", "Robot Ready.");    //
-        telemetry.update();
-
-
-        gyro.resetZAxisIntegrator();
-        getHeading();
-
-//test*/
         waitForStart();
 
         while (opModeIsActive()){
@@ -77,44 +57,28 @@ public class HolonimicTest extends LinearOpMode{
 
             x = gamepad1.left_stick_x;
             y = -gamepad1.left_stick_y;
-           // if(gamepad1.right_bumper){
-           //     z = gamepad1.right_stick_x * .5;
-           // }else{
-                z = gamepad1.right_stick_x;
-           // }
+            z = gamepad1.right_stick_x;
+
+            //defines the vector
+            //angle should output 0-260 deg
+
+            vectorMagnitude = Math.sqrt((y*y)+(x*x));
+            vectorAngleRAD = Math.atan2(y,x);
+            vectorAngleDEG = Math.toDegrees(vectorAngleRAD);
+
+            //add in angle offset
+            finalvectorAngleDEG = vectorAngleDEG + angles.firstAngle;
+
+            //convert back into x and y values
+            finalX = vectorMagnitude * Math.cos(finalvectorAngleDEG);
+            finalY = vectorMagnitude * Math.sin(finalvectorAngleDEG);
 
 
-            desiredHeading = Math.toDegrees(Math.atan2(x,y));
-
-
-            if(x == 0){
-                if(y<0){
-                    desiredHeading = 180;
-                }else{
-                    desiredHeading = 0;
-                }
-            }
-
-            finalAngle = desiredHeading;// + angles.firstAngle;
-            finalX = Math.sin(finalAngle) * 1;
-            finalY = Math.cos(finalAngle) * 1;
-
-            if(x < .05 && x > -.05){
-                finalX = 0;
-            }
-            if(y < .05 && y > -.05){
-                finalY = 0;
-            }
-
-            //robot.MotorLL.setPower(.25*(finalY + z));//x + z);
-            //robot.MotorLR.setPower(.25*(-finalY + z));//x + z);
-            //robot.MotorRL.setPower(.25*(finalX + z));//y + z);
-            //robot.MotorRR.setPower(.25*(-finalX + z));//y + z);
             LLDIR = finalY + z;
             LRDIR = -finalY + z;
             RLDIR = -finalX + z;
             RRDIR = finalX + z;
-
+/*
             maxmotor = Math.max(Math.max(Math.abs(LLDIR), Math.abs(LRDIR)), Math.max(Math.abs(RLDIR), Math.abs(RRDIR)));
 
             LLDIR = LLDIR/maxmotor;
@@ -128,13 +92,16 @@ public class HolonimicTest extends LinearOpMode{
             }
             if(gamepad1.right_bumper){
                 speed = .6;
-            }
+            }*/
 
-
-            robot.MotorLL.setPower(LLDIR*speed);
-            robot.MotorLR.setPower(LRDIR*speed);
-            robot.MotorRL.setPower(RLDIR*speed);
-            robot.MotorRR.setPower(RRDIR*speed);
+            robot.MotorLL.setPower(LLDIR);
+            robot.MotorLR.setPower(LRDIR);
+            robot.MotorRL.setPower(RLDIR);
+            robot.MotorRR.setPower(RRDIR);
+            //robot.MotorLL.setPower(LLDIR*speed);
+            //robot.MotorLR.setPower(LRDIR*speed);
+            //robot.MotorRL.setPower(RLDIR*speed);
+            //robot.MotorRR.setPower(RRDIR*speed);
             //robot.MotorLL.setPower(y + z);
             //robot.MotorLR.setPower(-y + z);
             //robot.MotorRL.setPower(-x + z);

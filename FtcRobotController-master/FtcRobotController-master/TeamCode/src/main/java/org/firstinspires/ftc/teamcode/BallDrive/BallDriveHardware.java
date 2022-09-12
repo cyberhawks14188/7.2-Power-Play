@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode.BallDrive;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class BallDriveHardware {
     // Motors and Servos
@@ -14,12 +19,32 @@ public class BallDriveHardware {
     public DcMotorEx MotorRR;
     public CRServo Servo1;
     public CRServo Servo2;
+    BNO055IMU imu;
+
+    Orientation angles;
+    Acceleration gravity;
+
+
+
 
 
 
     HardwareMap BDHardware;
 
     public void init(HardwareMap BDHardware){
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = false;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = BDHardware.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+
 
         // Define motors and servos
         MotorLL = BDHardware.get(DcMotorEx.class, "Motor1");
