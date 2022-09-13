@@ -36,6 +36,7 @@ public class Field_Centric_Holonomic extends LinearOpMode{
     double finalX, finalY;
     double RLDIR,RRDIR,LRDIR,LLDIR;
     double maxmotor, speed;
+    double IMU;
 
     double vectorMagnitude = 0, vectorAngleRAD = 0, vectorAngleDEG = 0;
     double finalvectorAngleDEG = 0;
@@ -50,9 +51,13 @@ public class Field_Centric_Holonomic extends LinearOpMode{
 
         while (opModeIsActive()){
             Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            IMU = -angles.firstAngle;
+            if(IMU < 0){
+                IMU = IMU + 360;
+            }
 
 
-            telemetry.addData("imu", robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES));
+            //telemetry.addData("imu", robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES));
             telemetry.addData("heading", angles.firstAngle);
 
             x = gamepad1.left_stick_x;
@@ -60,22 +65,25 @@ public class Field_Centric_Holonomic extends LinearOpMode{
             z = gamepad1.right_stick_x;
 
             //defines the vector
-            //angle should output 0-260 deg
+            //angle should output 0-360 deg
 
             vectorMagnitude = Math.sqrt((y*y)+(x*x));
             vectorAngleRAD = Math.atan2(y,x);
-            vectorAngleDEG = Math.toDegrees(vectorAngleRAD);
+            vectorAngleDEG = -Math.toDegrees(vectorAngleRAD);
+            if(vectorAngleDEG < 0){
+                vectorAngleDEG = vectorAngleDEG + 360;
+            }
 
             //add in angle offset
             finalvectorAngleDEG = vectorAngleDEG + angles.firstAngle;
 
             //convert back into x and y values
-            finalX = vectorMagnitude * Math.cos(finalvectorAngleDEG);
-            finalY = vectorMagnitude * Math.sin(finalvectorAngleDEG);
+            finalX = vectorMagnitude * Math.cos(Math.toRadians(finalvectorAngleDEG));
+            finalY = vectorMagnitude * Math.sin(Math.toRadians(finalvectorAngleDEG));
 
 
-            LLDIR = finalY + z;
-            LRDIR = -finalY + z;
+            LLDIR = -finalY + z;
+            LRDIR = finalY + z;
             RLDIR = -finalX + z;
             RRDIR = finalX + z;
 /*
@@ -115,7 +123,12 @@ public class Field_Centric_Holonomic extends LinearOpMode{
 
 
             //telemetry.addData("Gyro", getHeading());
-            telemetry.addData("final angle", finalAngle);
+            telemetry.addData("vector angle", vectorAngleDEG);
+            telemetry.addData("final vector angle", finalvectorAngleDEG);
+            telemetry.addData("FinalX", finalX);
+            telemetry.addData("FinalY", finalY);
+            telemetry.addData("IMU", IMU);
+            telemetry.addData("magnitude", vectorMagnitude);
 
 
 
@@ -130,8 +143,7 @@ public class Field_Centric_Holonomic extends LinearOpMode{
             telemetry.addData("y",y);
             telemetry.addData("x",x);
             telemetry.addData("z",z);
-            telemetry.addData("FinalX", finalX);
-            telemetry.addData("FinalY", finalY);
+
             dashboardTelemetry.update();
 
             telemetry.update();
@@ -139,11 +151,6 @@ public class Field_Centric_Holonomic extends LinearOpMode{
         }
 
     }
-
-    /*public double getHeading() {
-        robotHeading = (double)gyro.getIntegratedZValue();
-        return robotHeading;
-    }*/
 
 
 }
